@@ -27,4 +27,5 @@ def inspect_file(filepath: str, sheet_name=0):
     print(f"\nFirst 15 rows (raw, no header applied):")
     print(raw.to_string())
 if __name__ == "__main__":
-    inspect_file("data/raw/cbn_exchange_rate/statistical_bulletin_external_sector.xlsx", sheet_name="D.4.1")
+    inspect_file("data/raw/cbn_exchange_rate/statistical_bulletin_financial_sector.xlsx", sheet_name="A1.2")
+    inspect_file("data/raw/cbn_exchange_rate/statistical_bulletin_financial_sector.xlsx", sheet_name="A11")
