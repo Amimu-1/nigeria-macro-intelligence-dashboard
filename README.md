@@ -19,6 +19,7 @@ This is not a toy dataset exercise. Every number in this project traces back to 
 - **Cross-source validation** — CBN and NBS both report inflation; this project surfaces and investigates where they diverge (e.g., a 2025 CPI rebasing to 2024=100 creates a measurable gap between sources — exactly the kind of nuance a policy analyst should catch, not smooth over)
 - **Transparent handling of real-world data limitations** — the exchange rate series required merging two structurally different CBN rate regimes (a historical official rate and the newer NFEM rate) at a documented transition point; MPR, money supply, and banking sector ratios are reported at annual granularity in CBN's own bulletins, and this project preserves that true resolution rather than fabricating false monthly precision
 - **Proper data engineering, not spreadsheet hacking** — reproducible Python ETL, a documented relational schema, and version-controlled cleaning logic for every source
+- **Analysis that challenges the obvious narrative** — SQL analysis reveals the CBN's real policy rate was negative for most of 2016–2024, meaning monetary tightening was often accommodative in real terms despite aggressive nominal rate hikes
 - **Built by someone who works with data professionally** — combining a Data Analyst background with hands-on quality assurance leadership experience and postgraduate study in Public Policy and Administration
 
 ## Architecture
@@ -39,19 +40,21 @@ Power BI Dashboard  +  Policy Brief  (in progress)
 
 **Database design:** a `dim_date` dimension table joined to seven per-source fact tables (`fact_cbn_inflation`, `fact_nbs_cpi`, `fact_exchange_rate`, `fact_mpr`, `fact_money_supply`, `fact_reserves`, `fact_banking_ratios`), enabling clean time-series joins across every economic indicator in the project.
 
+**Analytical layer:** 8 SQL queries in `src/analysis/analytical_queries.py`, using CTEs and window functions to compute moving averages, year-over-year growth rates, cross-source gaps, and before/after policy-shock comparisons.
+
 ## Tech Stack
 
 | Layer | Tools |
 |---|---|
 | Ingestion & Cleaning | Python, Pandas, openpyxl, python-calamine |
 | Database | SQLite (star schema) |
-| Analysis | SQL (CTEs, joins across fact tables) |
+| Analysis | SQL (CTEs, window functions, multi-table joins) |
 | Visualization | Power BI *(in progress)* |
 | Testing | pytest *(planned)* |
 
 ## Current Status
 
-Core data collection is now complete across all six macroeconomic domains. Remaining work focuses on analysis, visualization, and the policy brief:
+Data collection and analytical layers are complete. Remaining work focuses on visualization and the policy brief:
 
 - [x] Environment and repository setup
 - [x] CBN inflation data — ingested, cleaned, validated (2015–2025, monthly)
@@ -62,17 +65,19 @@ Core data collection is now complete across all six macroeconomic domains. Remai
 - [x] Money supply (Broad Money) — annual, 2015–2024
 - [x] External reserves (2015–2024, monthly)
 - [x] Banking sector health metrics — liquidity ratio and loan-to-deposit ratio, annual, 2015–2024
-- [ ] 8+ advanced analytical SQL queries (post-subsidy impact, correlation analysis, sector health)
+- [x] 8 advanced analytical SQL queries (inflation trends, cross-source validation, real policy rate, money supply-inflation link, post-subsidy impact, FX-reserves relationship, banking health)
 - [ ] 4-page Power BI dashboard
 - [ ] Policy brief with evidence-based recommendations
 
 ## Sample Findings
 
-- Cross-referencing CBN and NBS headline inflation for November 2025 reveals a **2.9 percentage point gap** (17.33% vs. 14.45%) — likely attributable to NBS's 2025 CPI rebasing to a 2024=100 base year.
-- Between 2015 and 2024, Nigeria's Broad Money supply grew from roughly **₦21.3 trillion to ₦113.4 trillion** — more than a five-fold increase — while the Monetary Policy Rate rose from 11.5% to 27.5% over the same period, reflecting an aggressive tightening cycle in response to persistent inflationary pressure.
-- Despite the naira's sharp devaluation and the aggressive rate-hiking cycle over the same period, commercial banks' liquidity ratio and loan-to-deposit ratio both remained comfortably within regulatory bounds throughout 2015–2024, suggesting the banking sector weathered macro volatility without a systemic liquidity crisis.
+- Cross-referencing CBN and NBS headline inflation reveals a precise structural break: every month before January 2025 matches exactly (0.00 gap), while every month from January 2025 onward shows a consistent **2.9–3.9 percentage point gap** — a clean, dated signature of NBS's CPI rebasing to a 2024=100 base year.
+- The CBN's **real policy rate** (MPR minus inflation) was negative in 7 of the last 9 years, reaching **-10.17 percentage points in 2023** — meaning that despite aggressive nominal rate hikes (11% to 27.5%), Nigerian monetary policy was often accommodative rather than restrictive in real terms.
+- Broad Money supply growth spiked to **51.86% in 2023** and **43.03% in 2024** — far above any prior year in the dataset — coinciding precisely with the period of highest recorded inflation (28.92% and 34.80%).
+- In the 12 months following the May 2023 fuel subsidy removal, average inflation rose from **21.15% to 28.86%**, and the average exchange rate more than doubled, from **₦444.79 to ₦1,005.87** per US dollar.
+- Despite this volatility, commercial banks' liquidity ratio and loan-to-deposit ratio remained within regulatory bounds in every single year from 2015 to 2024, suggesting the banking sector absorbed the macro shocks without a systemic liquidity crisis.
 
-These findings, and others, will be explored in depth in the forthcoming policy brief.
+These findings are explored in depth in the forthcoming policy brief.
 
 ## Getting Started
 
@@ -98,8 +103,8 @@ python src/cleaning/clean_cbn_reserves.py
 python src/cleaning/clean_cbn_banking_ratios.py
 python src/database/build_database.py
 
-# Explore the data
-python src/analysis/test_query.py
+# Explore the data and run the analytical queries
+python src/analysis/analytical_queries.py
 ```
 
 ## Data Sources
