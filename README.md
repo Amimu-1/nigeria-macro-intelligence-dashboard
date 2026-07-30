@@ -15,8 +15,9 @@ This is not a toy dataset exercise. Every number in this project traces back to 
 
 ## What Makes This Different
 
-- **Real government data, not sample datasets** — sourced directly from CBN's rate exports and NBS's Nigeria Data Portal
+- **Real government data, not sample datasets** — sourced directly from CBN's rate exports, CBN's Statistical Bulletins, and NBS's Nigeria Data Portal
 - **Cross-source validation** — CBN and NBS both report inflation; this project surfaces and investigates where they diverge (e.g., a 2025 CPI rebasing to 2024=100 creates a measurable gap between sources — exactly the kind of nuance a policy analyst should catch, not smooth over)
+- **Transparent handling of real-world data limitations** — the exchange rate series required merging two structurally different CBN rate regimes (a historical official rate and the newer NFEM rate) at a documented transition point; MPR and money supply are reported at annual granularity in CBN's own bulletins, and this project preserves that true resolution rather than fabricating false monthly precision
 - **Proper data engineering, not spreadsheet hacking** — reproducible Python ETL, a documented relational schema, and version-controlled cleaning logic for every source
 - **Built by someone who works with data professionally** — combining a Data Analyst background with hands-on quality assurance leadership experience and postgraduate study in Public Policy and Administration
 
@@ -36,7 +37,7 @@ Analytical Queries & Insights  (src/analysis/)
 Power BI Dashboard  +  Policy Brief  (in progress)
 ```
 
-**Database design:** a `dim_date` dimension table joined to per-source fact tables (`fact_cbn_inflation`, `fact_nbs_cpi`, `fact_exchange_rate`, with more indicators being added), enabling clean time-series joins across every economic indicator in the project.
+**Database design:** a `dim_date` dimension table joined to per-source fact tables (`fact_cbn_inflation`, `fact_nbs_cpi`, `fact_exchange_rate`, `fact_mpr`, `fact_money_supply`, with more indicators being added), enabling clean time-series joins across every economic indicator in the project.
 
 ## Tech Stack
 
@@ -57,16 +58,20 @@ This project is under active development, built incrementally and transparently:
 - [x] NBS CPI data — ingested, cleaned, validated (2015–2025, monthly)
 - [x] SQLite star schema database with joined fact tables
 - [x] Exchange rate data (2015–2026, monthly, merged across historical and NFEM regimes)
+- [x] Interest rates (MPR) — annual, 2015–2024
+- [x] Money supply (Broad Money) — annual, 2015–2024
 - [ ] Foreign reserves data
-- [ ] Interest rates (MPR) & money supply (M1/M2/M3)
 - [ ] Banking sector health metrics
 - [ ] 8+ advanced analytical SQL queries (post-subsidy impact, correlation analysis, sector health)
 - [ ] 4-page Power BI dashboard
 - [ ] Policy brief with evidence-based recommendations
 
-## Sample Finding
+## Sample Findings
 
-Cross-referencing CBN and NBS headline inflation for November 2025 reveals a **2.9 percentage point gap** (17.33% vs. 14.45%) — likely attributable to NBS's 2025 CPI rebasing to a 2024=100 base year. This kind of source discrepancy has real implications for policy communication and public trust in official statistics, and will be explored further in the forthcoming policy brief.
+- Cross-referencing CBN and NBS headline inflation for November 2025 reveals a **2.9 percentage point gap** (17.33% vs. 14.45%) — likely attributable to NBS's 2025 CPI rebasing to a 2024=100 base year.
+- Between 2015 and 2024, Nigeria's Broad Money supply grew from roughly **₦21.3 trillion to ₦113.4 trillion** — more than a five-fold increase — while the Monetary Policy Rate rose from 11.5% to 27.5% over the same period, reflecting an aggressive tightening cycle in response to persistent inflationary pressure.
+
+These findings, and others, will be explored in depth in the forthcoming policy brief.
 
 ## Getting Started
 
@@ -86,6 +91,8 @@ python src/cleaning/clean_nbs_cpi.py
 python src/cleaning/clean_cbn_exchange_rate.py
 python src/cleaning/clean_cbn_exchange_rate_historical.py
 python src/cleaning/merge_exchange_rate.py
+python src/cleaning/clean_cbn_mpr.py
+python src/cleaning/clean_cbn_money_supply.py
 python src/database/build_database.py
 
 # Explore the data
@@ -95,6 +102,7 @@ python src/analysis/test_query.py
 ## Data Sources
 
 - [CBN Data & Statistics](https://www.cbn.gov.ng/rates/)
+- [CBN Statistical Bulletin](https://www.cbn.gov.ng/documents/Statbulletin.html)
 - [Nigeria Data Portal (NBS)](https://nigeria.opendataforafrica.org/)
 
 ## About the Author
