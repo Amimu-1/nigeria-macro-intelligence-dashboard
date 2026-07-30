@@ -42,9 +42,13 @@ def main():
     fx = pd.read_csv("data/processed/cbn_exchange_rate_merged.csv", parse_dates=["date"])
     mpr = pd.read_csv("data/processed/cbn_mpr_clean.csv", parse_dates=["date"])
     money_supply = pd.read_csv("data/processed/cbn_money_supply_clean.csv", parse_dates=["date"])
+    reserves = pd.read_csv("data/processed/cbn_reserves_clean.csv", parse_dates=["date"])
 
     # Build date dimension from combined date range of all sources
-    all_dates = pd.concat([cbn["date"], nbs["date"], fx["date"], mpr["date"], money_supply["date"]])
+    all_dates = pd.concat([
+        cbn["date"], nbs["date"], fx["date"], mpr["date"],
+        money_supply["date"], reserves["date"]
+    ])
     dim_date = build_dim_date(conn, all_dates)
 
     # Build fact tables
@@ -74,6 +78,11 @@ def main():
     build_fact_table(
         conn, money_supply, dim_date, "fact_money_supply",
         ["broad_money"]
+    )
+
+    build_fact_table(
+        conn, reserves, dim_date, "fact_reserves",
+        ["external_reserves_usd_million"]
     )
 
     conn.close()
