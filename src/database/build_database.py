@@ -39,9 +39,10 @@ def main():
     # Load cleaned CSVs
     cbn = pd.read_csv("data/processed/cbn_inflation_clean.csv", parse_dates=["date"])
     nbs = pd.read_csv("data/processed/nbs_cpi_clean.csv", parse_dates=["date"])
+    fx = pd.read_csv("data/processed/cbn_exchange_rate_merged.csv", parse_dates=["date"])
 
-    # Build date dimension from combined date range of both sources
-    all_dates = pd.concat([cbn["date"], nbs["date"]])
+    # Build date dimension from combined date range of all sources
+    all_dates = pd.concat([cbn["date"], nbs["date"], fx["date"]])
     dim_date = build_dim_date(conn, all_dates)
 
     # Build fact tables
@@ -56,6 +57,11 @@ def main():
     build_fact_table(
         conn, nbs, dim_date, "fact_nbs_cpi",
         ["cpi_index", "inflation_yoy"]
+    )
+
+    build_fact_table(
+        conn, fx, dim_date, "fact_exchange_rate",
+        ["exchange_rate", "source"]
     )
 
     conn.close()
