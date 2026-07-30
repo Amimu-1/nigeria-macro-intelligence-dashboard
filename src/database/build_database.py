@@ -43,11 +43,12 @@ def main():
     mpr = pd.read_csv("data/processed/cbn_mpr_clean.csv", parse_dates=["date"])
     money_supply = pd.read_csv("data/processed/cbn_money_supply_clean.csv", parse_dates=["date"])
     reserves = pd.read_csv("data/processed/cbn_reserves_clean.csv", parse_dates=["date"])
+    banking = pd.read_csv("data/processed/cbn_banking_ratios_clean.csv", parse_dates=["date"])
 
     # Build date dimension from combined date range of all sources
     all_dates = pd.concat([
         cbn["date"], nbs["date"], fx["date"], mpr["date"],
-        money_supply["date"], reserves["date"]
+        money_supply["date"], reserves["date"], banking["date"]
     ])
     dim_date = build_dim_date(conn, all_dates)
 
@@ -83,6 +84,11 @@ def main():
     build_fact_table(
         conn, reserves, dim_date, "fact_reserves",
         ["external_reserves_usd_million"]
+    )
+
+    build_fact_table(
+        conn, banking, dim_date, "fact_banking_ratios",
+        ["liquidity_ratio", "loan_to_deposit_ratio"]
     )
 
     conn.close()
