@@ -9,9 +9,26 @@
 
 ## Overview
 
-Nigeria's macroeconomic data is publicly available — but it is scattered, inconsistently formatted, and rarely analyzed rigorously in one place. This project builds a production-grade pipeline that ingests real Central Bank of Nigeria (CBN) and National Bureau of Statistics (NBS) data, cleans it to analysis-ready standards, structures it in a relational database, and surfaces policy-relevant insights — the kind of work expected at institutions like the CBN, World Bank, PenCom, and ECOWAS.
+Nigeria's macroeconomic data is publicly available — but it is scattered, inconsistently formatted, and rarely analyzed rigorously in one place. This project builds a production-grade pipeline that ingests real Central Bank of Nigeria (CBN) and National Bureau of Statistics (NBS) data, cleans it to analysis-ready standards, structures it in a relational database, and surfaces policy-relevant insights through a fully interactive Power BI dashboard — the kind of work expected at institutions like the CBN, World Bank, PenCom, and ECOWAS.
 
 This is not a toy dataset exercise. Every number in this project traces back to an official, verifiable public source.
+
+## Dashboard Preview
+
+### Overview
+![Overview Page](dashboard/screenshots/01_overview.png)
+
+### Inflation & Prices
+![Inflation and Prices Page](dashboard/screenshots/02_inflation_prices.png)
+
+### Exchange Rates & Reserves
+![Exchange Rates and Reserves Page](dashboard/screenshots/03_exchange_rates_reserves.png)
+
+### Interest Rates & Money Supply
+![Interest Rates and Money Supply Page](dashboard/screenshots/04_interest_rates_money_supply.png)
+
+### Banking Sector Health
+![Banking Sector Health Page](dashboard/screenshots/05_banking_sector_health.png)
 
 ## What Makes This Different
 
@@ -20,6 +37,7 @@ This is not a toy dataset exercise. Every number in this project traces back to 
 - **Transparent handling of real-world data limitations** — the exchange rate series required merging two structurally different CBN rate regimes (a historical official rate and the newer NFEM rate) at a documented transition point; MPR, money supply, and banking sector ratios are reported at annual granularity in CBN's own bulletins, and this project preserves that true resolution rather than fabricating false monthly precision
 - **Proper data engineering, not spreadsheet hacking** — reproducible Python ETL, a documented relational schema, and version-controlled cleaning logic for every source
 - **Analysis that challenges the obvious narrative** — SQL analysis reveals the CBN's real policy rate was negative for most of 2016–2024, meaning monetary tightening was often accommodative in real terms despite aggressive nominal rate hikes
+- **A fully designed, executive-grade dashboard** — 5-page Power BI report with a consistent visual system (branded headers, color-coded KPI cards, accurate unit formatting, and protected cross-filtering) built for a financial and policy audience
 - **Built by someone who works with data professionally** — combining a Data Analyst background with hands-on quality assurance leadership experience and postgraduate study in Public Policy and Administration
 
 ## Architecture
@@ -42,6 +60,8 @@ Power BI Dashboard  +  Policy Brief  (in progress)
 
 **Analytical layer:** 8 SQL queries in `src/analysis/analytical_queries.py`, using CTEs and window functions to compute moving averages, year-over-year growth rates, cross-source gaps, and before/after policy-shock comparisons.
 
+**Visualization layer:** a 5-page Power BI dashboard (`dashboard/nigeria_macro_dashboard.pbix`) covering an executive Overview plus dedicated pages for Inflation & Prices, Exchange Rates & Reserves, Interest Rates & Money Supply, and Banking Sector Health.
+
 ## Tech Stack
 
 | Layer | Tools |
@@ -49,12 +69,12 @@ Power BI Dashboard  +  Policy Brief  (in progress)
 | Ingestion & Cleaning | Python, Pandas, openpyxl, python-calamine |
 | Database | SQLite (star schema) |
 | Analysis | SQL (CTEs, window functions, multi-table joins) |
-| Visualization | Power BI *(in progress)* |
+| Visualization | Power BI |
 | Testing | pytest *(planned)* |
 
 ## Current Status
 
-Data collection and analytical layers are complete. Remaining work focuses on visualization and the policy brief:
+Data collection, analysis, and visualization are complete. Remaining work focuses on the policy brief:
 
 - [x] Environment and repository setup
 - [x] CBN inflation data — ingested, cleaned, validated (2015–2025, monthly)
@@ -66,7 +86,7 @@ Data collection and analytical layers are complete. Remaining work focuses on vi
 - [x] External reserves (2015–2024, monthly)
 - [x] Banking sector health metrics — liquidity ratio and loan-to-deposit ratio, annual, 2015–2024
 - [x] 8 advanced analytical SQL queries (inflation trends, cross-source validation, real policy rate, money supply-inflation link, post-subsidy impact, FX-reserves relationship, banking health)
-- [ ] 4-page Power BI dashboard
+- [x] 5-page Power BI dashboard (Overview, Inflation & Prices, Exchange Rates & Reserves, Interest Rates & Money Supply, Banking Sector Health)
 - [ ] Policy brief with evidence-based recommendations
 
 ## Sample Findings
@@ -105,6 +125,9 @@ python src/database/build_database.py
 
 # Explore the data and run the analytical queries
 python src/analysis/analytical_queries.py
+
+# Open the dashboard
+# dashboard/nigeria_macro_dashboard.pbix (requires Power BI Desktop)
 ```
 
 ## Data Sources
