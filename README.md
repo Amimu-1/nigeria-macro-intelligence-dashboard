@@ -4,12 +4,12 @@
 
 [![Python](https://img.shields.io/badge/Python-3.14-blue.svg)](https://www.python.org/)
 [![SQLite](https://img.shields.io/badge/Database-SQLite-lightgrey.svg)](https://www.sqlite.org/)
-[![Status](https://img.shields.io/badge/Status-Active%20Development-brightgreen.svg)]()
+[![Status](https://img.shields.io/badge/Status-Complete-brightgreen.svg)]()
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## Overview
 
-Nigeria's macroeconomic data is publicly available — but it is scattered, inconsistently formatted, and rarely analyzed rigorously in one place. This project builds a production-grade pipeline that ingests real Central Bank of Nigeria (CBN) and National Bureau of Statistics (NBS) data, cleans it to analysis-ready standards, structures it in a relational database, and surfaces policy-relevant insights through a fully interactive Power BI dashboard — the kind of work expected at institutions like the CBN, World Bank, PenCom, and ECOWAS.
+Nigeria's macroeconomic data is publicly available — but it is scattered, inconsistently formatted, and rarely analyzed rigorously in one place. This project builds a production-grade pipeline that ingests real Central Bank of Nigeria (CBN) and National Bureau of Statistics (NBS) data, cleans it to analysis-ready standards, structures it in a relational database, surfaces policy-relevant insights through a fully interactive Power BI dashboard, and translates those findings into a formal policy brief — the kind of end-to-end work expected at institutions like the CBN, World Bank, PenCom, and ECOWAS.
 
 This is not a toy dataset exercise. Every number in this project traces back to an official, verifiable public source.
 
@@ -38,6 +38,7 @@ This is not a toy dataset exercise. Every number in this project traces back to 
 - **Proper data engineering, not spreadsheet hacking** — reproducible Python ETL, a documented relational schema, and version-controlled cleaning logic for every source
 - **Analysis that challenges the obvious narrative** — SQL analysis reveals the CBN's real policy rate was negative for most of 2016–2024, meaning monetary tightening was often accommodative in real terms despite aggressive nominal rate hikes
 - **A fully designed, executive-grade dashboard** — 5-page Power BI report with a consistent visual system (branded headers, color-coded KPI cards, accurate unit formatting, and protected cross-filtering) built for a financial and policy audience
+- **Findings translated into policy** — a formal policy brief with three evidence-based recommendations, each traced directly back to a specific analytical finding, not written independently of the data
 - **Built by someone who works with data professionally** — combining a Data Analyst background with hands-on quality assurance leadership experience and postgraduate study in Public Policy and Administration
 
 ## Architecture
@@ -53,7 +54,9 @@ SQLite Star Schema Database    (src/database/)
         ↓
 Analytical Queries & Insights  (src/analysis/)
         ↓
-Power BI Dashboard  +  Policy Brief  (in progress)
+Power BI Dashboard  (dashboard/)
+        ↓
+Policy Brief  (policy_brief/)
 ```
 
 **Database design:** a `dim_date` dimension table joined to seven per-source fact tables (`fact_cbn_inflation`, `fact_nbs_cpi`, `fact_exchange_rate`, `fact_mpr`, `fact_money_supply`, `fact_reserves`, `fact_banking_ratios`), enabling clean time-series joins across every economic indicator in the project.
@@ -61,6 +64,8 @@ Power BI Dashboard  +  Policy Brief  (in progress)
 **Analytical layer:** 8 SQL queries in `src/analysis/analytical_queries.py`, using CTEs and window functions to compute moving averages, year-over-year growth rates, cross-source gaps, and before/after policy-shock comparisons.
 
 **Visualization layer:** a 5-page Power BI dashboard (`dashboard/nigeria_macro_dashboard.pbix`) covering an executive Overview plus dedicated pages for Inflation & Prices, Exchange Rates & Reserves, Interest Rates & Money Supply, and Banking Sector Health.
+
+**Policy layer:** a 3-page policy brief (`policy_brief/Nigeria_Macro_Policy_Brief.docx`) with three recommendations, each grounded in a specific SQL finding from the analytical layer.
 
 ## Tech Stack
 
@@ -70,11 +75,9 @@ Power BI Dashboard  +  Policy Brief  (in progress)
 | Database | SQLite (star schema) |
 | Analysis | SQL (CTEs, window functions, multi-table joins) |
 | Visualization | Power BI |
-| Testing | pytest *(planned)* |
+| Policy Writing | Structured policy brief, Word format |
 
-## Current Status
-
-Data collection, analysis, and visualization are complete. Remaining work focuses on the policy brief:
+## Project Status: Complete
 
 - [x] Environment and repository setup
 - [x] CBN inflation data — ingested, cleaned, validated (2015–2025, monthly)
@@ -87,9 +90,9 @@ Data collection, analysis, and visualization are complete. Remaining work focuse
 - [x] Banking sector health metrics — liquidity ratio and loan-to-deposit ratio, annual, 2015–2024
 - [x] 8 advanced analytical SQL queries (inflation trends, cross-source validation, real policy rate, money supply-inflation link, post-subsidy impact, FX-reserves relationship, banking health)
 - [x] 5-page Power BI dashboard (Overview, Inflation & Prices, Exchange Rates & Reserves, Interest Rates & Money Supply, Banking Sector Health)
-- [ ] Policy brief with evidence-based recommendations
+- [x] Policy brief with three evidence-based recommendations
 
-## Sample Findings
+## Key Findings & Recommendations
 
 - Cross-referencing CBN and NBS headline inflation reveals a precise structural break: every month before January 2025 matches exactly (0.00 gap), while every month from January 2025 onward shows a consistent **2.9–3.9 percentage point gap** — a clean, dated signature of NBS's CPI rebasing to a 2024=100 base year.
 - The CBN's **real policy rate** (MPR minus inflation) was negative in 7 of the last 9 years, reaching **-10.17 percentage points in 2023** — meaning that despite aggressive nominal rate hikes (11% to 27.5%), Nigerian monetary policy was often accommodative rather than restrictive in real terms.
@@ -97,7 +100,7 @@ Data collection, analysis, and visualization are complete. Remaining work focuse
 - In the 12 months following the May 2023 fuel subsidy removal, average inflation rose from **21.15% to 28.86%**, and the average exchange rate more than doubled, from **₦444.79 to ₦1,005.87** per US dollar.
 - Despite this volatility, commercial banks' liquidity ratio and loan-to-deposit ratio remained within regulatory bounds in every single year from 2015 to 2024, suggesting the banking sector absorbed the macro shocks without a systemic liquidity crisis.
 
-These findings are explored in depth in the forthcoming policy brief.
+Based on this evidence, the [policy brief](policy_brief/Nigeria_Macro_Policy_Brief.docx) recommends: (1) anchoring MPR decisions to a real, inflation-adjusted target rather than a nominal one; (2) sequencing major fiscal and monetary reforms with an explicit money supply ceiling; and (3) establishing a joint CBN-NBS inflation reconciliation statement following methodology changes.
 
 ## Getting Started
 
@@ -126,8 +129,11 @@ python src/database/build_database.py
 # Explore the data and run the analytical queries
 python src/analysis/analytical_queries.py
 
-# Open the dashboard
-# dashboard/nigeria_macro_dashboard.pbix (requires Power BI Desktop)
+# Open the dashboard (requires Power BI Desktop)
+# dashboard/nigeria_macro_dashboard.pbix
+
+# Read the policy brief
+# policy_brief/Nigeria_Macro_Policy_Brief.docx
 ```
 
 ## Data Sources
@@ -145,4 +151,4 @@ python src/analysis/analytical_queries.py
 
 ---
 
-*This project is actively maintained. Star or watch the repo to follow its progress toward a complete macroeconomic intelligence platform.*
+*This project is complete and actively maintained. Star or watch the repo to follow future updates.*
